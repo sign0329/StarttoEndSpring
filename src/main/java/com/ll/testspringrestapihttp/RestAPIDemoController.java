@@ -1,7 +1,10 @@
 package com.ll.testspringrestapihttp;
 
+import jakarta.annotation.PostConstruct;
+import org.hibernate.annotations.Comment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -9,17 +12,29 @@ import java.util.*;
 @RestController
 @RequestMapping("/coffees")
 public class RestAPIDemoController {
-    private List<Coffee> coffees = new ArrayList<>();
+    private final CoffeeRepository coffeeRepository;
 
-    public RestAPIDemoController(){
-        coffees.addAll(List.of(
-                new Coffee("Cafe Cereza"),
-                new Coffee("Cafe Grander"),
-                new Coffee("Cafe larno"),
-                new Coffee("Cafe Mega")
-        ));
+    public RestAPIDemoController(CoffeeRepository coffeeRepository) {
+        this.coffeeRepository = coffeeRepository;
     }
 
+    @Component
+    class DataLoader {
+        private final CoffeeRepository coffeeRepository;
+        public DataLoader(CoffeeRepository coffeeRepository) {
+            this.coffeeRepository = coffeeRepository;
+        }
+
+        @PostConstruct
+        private void loadData() {
+            coffeeRepository.saveAll(List.of(
+                    new Coffee("cage one"),
+                    new Coffee("cage two"),
+                    new Coffee("cage three"),
+                    new Coffee("cage four")
+            ));
+        }
+    }
 //    @RequestMapping(value = "/coffees", method = RequestMethod.GET) // getCoffee /coffee에만 대답할수 있게 제한함.
 //    Iterator<Coffee> getCoffee(){
 //        return coffees;
@@ -27,43 +42,26 @@ public class RestAPIDemoController {
 
     @GetMapping
     Iterable<Coffee> getCoffees(){
-        return coffees;
+        return coffeeRepository.findAll();
     }
 
     @GetMapping("/{id}")
     Optional<Coffee> getCoffeeById(@PathVariable String id) {
-        for (Coffee c : coffees) {
-            if (c.getId().equals(id)) {
-                return Optional.of(c);
-            }
-        }
-        return Optional.empty();
+        return coffeeRepository.findById(id);
     }
 
     @PostMapping
     Coffee postCoffee(@RequestBody Coffee coffee){
-        coffees.add(coffee);
-        return coffee;
+        return coffeeRepository.save(coffee);
     }
 
     @PutMapping("/{id}")
     ResponseEntity<Coffee> putCoffee(@PathVariable String id,
-    @RequestBody Coffee coffee){
-
-        {
-            int coffeeIndex = -1;
-
-            for (Coffee c : coffees) {
-                if (c.getId().equals(id)) {
-                    coffeeIndex = coffees.indexOf(c);
-
-                    coffees.set(coffeeIndex, coffee);
-                }
-            }
-            return (coffeeIndex == -1) ?
-                    new ResponseEntity<>(postCoffee(coffee), HttpStatus.CREATED) :
-                    new ResponseEntity<>(coffee, HttpStatus.OK);
-        }
+                                     @RequestBody Coffee coffee){
+        return (coffeeRepository.existsById(id))
+                ? new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.OK)
+                : new ResponseEntity<>((coffeeRepository.save(coffee)),
+                HttpStatus.CREATED);
     }
 
 //    @PutMapping("/{id}")
@@ -71,7 +69,7 @@ public class RestAPIDemoController {
 //        // 클라이언트가 제공한 ID와 URL의 ID가 다르면 400 Bad Request
 //        if (!id.equals(coffee.getId())) {
 //            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
+//        }ㅇ
 //
 //        // 기존 리스트에서 객체를 찾거나 새로 추가
 //        for (int i = 0; i < coffees.size(); i++) {
@@ -91,8 +89,7 @@ public class RestAPIDemoController {
 
     @DeleteMapping("/{id}")
     void deleteCoffee(@PathVariable String id){
-        coffees.removeIf(c -> c.getId().equals(id));
+        coffeeRepository.deleteById(id);
     }
 }
-
 

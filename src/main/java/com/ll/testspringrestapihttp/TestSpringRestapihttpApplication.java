@@ -1,5 +1,7 @@
 package com.ll.testspringrestapihttp;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,9 +16,10 @@ public class TestSpringRestapihttpApplication {
 
 }
 
-
+@Entity
 class Coffee{
-    private  String id;
+    @Id
+    private String id;
     private String name;
 
     public Coffee(String id, String name){
@@ -24,9 +27,12 @@ class Coffee{
         this.name = name;
     }
 
+    public Coffee() {}
+
     public Coffee(String name){
         this(UUID.randomUUID().toString(), name);
     }
+
     public String getId(){
         return id;
     }
@@ -41,3 +47,4 @@ class Coffee{
         this.name = name;
     }
 }
+

@@ -4,10 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.annotation.Bean;
 
 import java.util.UUID;
 
+
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class TestSpringRestapihttpApplication {
 
     public static void main(String[] args) {
@@ -46,5 +51,6 @@ class Coffee{
     public void setName(String name){
         this.name = name;
     }
+
 }
 

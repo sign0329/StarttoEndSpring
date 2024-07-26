@@ -1,7 +1,6 @@
 package com.ll.testspringrestapihttp;
 
 import jakarta.annotation.PostConstruct;
-import org.hibernate.annotations.Comment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -91,5 +90,6 @@ public class RestAPIDemoController {
     void deleteCoffee(@PathVariable String id){
         coffeeRepository.deleteById(id);
     }
+
 }
 
